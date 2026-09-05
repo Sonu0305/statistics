@@ -166,10 +166,7 @@ function [varargout] = grpstats (x, group = [], whichstats = [], varargin)
   if (ndims (x) != 2)
      error ("grpstats: X must be a matrix or a table.");
   endif
-  if (isempty (x))
-    [varargout] = repmat ({[]}, nargout, 1);
-    return;
-  endif
+
   if (! istable (x) && isvector (x))
     x = x(:);
   endif
@@ -183,9 +180,15 @@ function [varargout] = grpstats (x, group = [], whichstats = [], varargin)
   ## Add default grouping variable
   no_group = true;
   if (isempty (group))
-    grp_idx = ones (r, 1);
-    r_names = {'All'};
-    ngroups = 1;
+    if (r == 0)
+      grp_idx = ones (0, 1);
+      r_names = {};
+      ngroups = 0;
+    else
+      grp_idx = ones (r, 1);
+      r_names = {'All'};
+      ngroups = 1;
+    endif
     no_group = false;
   endif
 
@@ -553,6 +556,8 @@ function [varargout] = grpstats (x, group = [], whichstats = [], varargin)
 
     ## From this point we can start applying functions on the entire array
     for fcn_idx = 1:fcn_num
+      group_mean = group_sem = group_std = group_var = group_min = group_max = group_range = NaN (ngroups, c);
+      group_numel = zeros (ngroups, c);
       switch (fcn_names{fcn_idx})
         case 'mean'
           for idx = 1:ngroups
@@ -725,9 +730,8 @@ endfunction
 %! assert_equal (abs (p(:,1,1)), expected_lower, 1e-3);
 %! assert_equal (abs (p(:,1,2)), expected_upper, 1e-3);
 %!test
-%! [mC, g] = grpstats ([], []);
+%! mC = grpstats ([], []);
 %! assert_equal (isempty (mC), true);
-%! assert_equal (isempty (g), true);
 %!test
 %! ## column vector, no group
 %! x = [1; 2; 3; 4; 5];
@@ -1492,3 +1496,10 @@ endfunction
 %!       grpstats ([1:5]', {'A'; 'B'; 'A'; 'B'})
 %!error <grpstats: inconsistent number of output arguments.> ...
 %!       m = grpstats ([1:4]', {'A'; 'B'; 'A'; 'B'}, {'mean', 'std'})
+
+## Edge cases with empty arrays
+%!assert_equal (grpstats ([], []), zeros (0, 0))
+%!assert_equal (grpstats (zeros (0, 3), zeros (0, 1)), zeros (0, 3))
+%!assert_equal (grpstats (zeros (3, 0), [1; 1; 2]), zeros (2, 0))
+%!assert_equal (grpstats ([NaN; NaN; NaN], [1; 1; 2]), NaN (2, 1))
+%!assert_equal (grpstats ([1 NaN 3; 4 NaN 6; NaN NaN NaN], [1; 2; 1]), [1 NaN 3; 4 NaN 6])
