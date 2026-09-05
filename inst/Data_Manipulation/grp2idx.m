@@ -122,8 +122,9 @@ function [g, gn, gl] = grp2idx (s)
   ## Fix order in here, since unique does not support this yet
   if (iscellstr (s) && ! is_categorical)
     I = sort (I);
+    gl_s = cell (0, 1);
     for i = 1:length (gl)
-      gl_s(i) = gl(g(I(i)));
+      gl_s{i} = gl{g(I(i))};
       idx(i,:) = (g == g(I(i)));
     endfor
     for i = 1:length (gl)
@@ -461,3 +462,10 @@ endfunction
 %!error <grp2idx: 'numeric' grouping variable must be a vector.> grp2idx ([10, 20; 10, 30])
 %!error <grp2idx: 'logical' grouping variable must be a vector.> grp2idx ([true, false; false, true])
 %!error <grp2idx: 'cell array' grouping variable must be a vector.> grp2idx ({'a', 'b'; 'c', 'd'})
+
+%!test
+%! ## Edge cases with empty arrays
+%! [g, gn, gl] = grp2idx (cell (0, 1));
+%! assert_equal (g, []);
+%! assert_equal (gn, cell (0, 1));
+%! assert_equal (gl, cell (0, 1));

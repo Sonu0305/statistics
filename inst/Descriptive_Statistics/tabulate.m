@@ -467,3 +467,10 @@ endfunction
 %! tabulate (string ({'a', 'b'; 'a', 'c'}))
 %!error<tabulate: X must be numeric, logical, categorical, cellstring, string, or a char array.> ...
 %! tabulate ({3, 3, 3, 3})
+
+%!test
+%! ## Edge cases with empty arrays
+%! assert_equal (tabulate ([]), zeros (0, 1));
+%! assert_equal (tabulate (zeros (0, 3)), zeros (0, 1));
+%! assert_equal (tabulate (zeros (3, 0)), zeros (0, 1));
+%! assert_equal (tabulate ({}), cell (0, 3));
