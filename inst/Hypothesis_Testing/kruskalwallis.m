@@ -97,6 +97,36 @@ function [p, tbl, stats] = kruskalwallis (x, group, displayopt)
   plotdata = ! (strcmp (displayopt, 'off'));
 
   ## Convert group to cell array from character array, make it a column
+  if (isempty (x))
+    p = NaN;
+    if (ismatrix (x) && size (x, 1) == 0 && size (x, 2) > 0)
+      m = size (x, 2);
+    elseif (size (x, 1) == 0 && size (x, 2) == 0)
+      m = 0;
+    else
+      m = 1;
+    endif
+    if (m == 0)
+      gnames = "1";
+      stats_n = zeros (1, 0);
+      meanranks = NaN;
+    else
+      gnames = num2str ((1:m)');
+      stats_n = zeros (1, m);
+      meanranks = NaN (1, m);
+    endif
+    tbl = {"Source", "SS", "df", "MS", "Chi-sq", "Prob>Chi-sq";
+           "Columns", NaN, m - 1, NaN, NaN, NaN;
+           "Error", NaN, -m, NaN, zeros(0,0), zeros(0,0);
+           "Total", 0, -1, zeros(0,0), zeros(0,0), zeros(0,0)};
+    stats.gnames = gnames;
+    stats.n = stats_n;
+    stats.source = "kruskalwallis";
+    stats.meanranks = meanranks;
+    stats.sumt = 0;
+    return;
+  endif
+
   if (! isempty (group) && ischar (group))
     group = cellstr (group);
   endif
@@ -290,3 +320,21 @@ endfunction
 %! assert_equal (stats.meanranks, means, 1e-6);
 %! assert_equal (length (stats.gnames), 10, 0);
 %! assert_equal (stats.n, N, 0);
+
+%!test
+%! ## Edge cases with empty arrays
+%! [p, tbl, s] = kruskalwallis ([], [], 'off');
+%! assert_equal (isnan (p), true);
+%! assert_equal (size (tbl), [4 6]);
+%! assert_equal (isnan (tbl{2, 2}), true);
+%! assert_equal (s.gnames, "1");
+%! assert_equal (s.n, zeros (1, 0));
+%! assert_equal (isnan (s.meanranks), true);
+
+%!test
+%! [p, tbl, s] = kruskalwallis (zeros (0, 3), [], 'off');
+%! assert_equal (isnan (p), true);
+%! assert_equal (size (tbl), [4 6]);
+%! assert_equal (isnan (tbl{2, 2}), true);
+%! assert_equal (s.n, [0 0 0]);
+%! assert_equal (isnan (s.meanranks), [true true true]);

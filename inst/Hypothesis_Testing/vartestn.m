@@ -101,6 +101,9 @@ function [p, stats] = vartestn (x, group, varargin)
   if (nargin < 1)
     error ("vartestn: too few input arguments.");
   endif
+  if (isempty (x))
+    error ("vartestn: X must not be empty.");
+  endif
   if (isscalar (x))
     error ("vartestn: X must be a vector or a matrix.");
   endif
@@ -416,3 +419,6 @@ endfunction
 %! assert_equal (p, 8.235660885480556e-07, 1e-14);
 %! assert_equal (stat.fstat, 8.6766, 1e-4);
 %! assert_equal (stat.df, [4, 595]);
+
+%!error<vartestn: X must not be empty.> vartestn ([])
+%!error<vartestn: X must not be empty.> vartestn (zeros (0, 3))
