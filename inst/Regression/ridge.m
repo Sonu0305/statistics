@@ -61,10 +61,10 @@ function b = ridge (y, X, k, scaled)
   if (nargin < 3)
     error ("ridge: function called with too few input arguments.");
   endif
-  if (! isvector (y) || columns (y) != 1 || isempty (y))
+  if (! isvector (y) || columns (y) != 1)
     error ("ridge: Y must be a numeric column vector.");
   endif
-  if (! ismatrix (X) || isempty (X))
+  if (! ismatrix (X))
     error ("ridge: X must be a numeric matrix.");
   endif
   if (rows (y) != rows (X))
@@ -231,10 +231,16 @@ endfunction
 %!error<ridge: Y must be a numeric column vector.> ridge (ones (3), ones (3), 2)
 %!error<ridge: Y must be a numeric column vector.> ridge ([1, 2], ones (2), 2)
 %!error<ridge: Y must be a numeric column vector.> ridge ([], ones (3), 2)
-%!error<ridge: X must be a numeric matrix.> ridge (ones (5,1), [], 2)
+%!error<ridge: Y and X must contain the same number of rows.> ridge (ones (5,1), [], 2)
 %!error<ridge: Y and X must contain the same number of rows.> ...
 %! ridge ([1; 2; 3; 4; 5], ones (3), 3)
 %!error<ridge: wrong value for SCALED argument.> ...
 %! ridge ([1; 2; 3], ones (3), 3, 2)
 %!error<ridge: wrong value for SCALED argument.> ...
 %! ridge ([1; 2; 3], ones (3), 3, 'some')
+
+%!test
+%! ## Edge cases with empty arrays
+%! b = ridge (zeros (0, 1), zeros (0, 3), 0.5);
+%! assert_equal (size (b), [3 1]);
+%! assert_equal (b, zeros (3, 1));

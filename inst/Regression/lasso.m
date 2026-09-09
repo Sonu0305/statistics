@@ -100,12 +100,15 @@ function [B, FitInfo] = lasso (X, y, varargin)
   if (! (isnumeric (X) && isreal (X) && ismatrix (X)))
     error ("lasso: X must be a real matrix.");
   endif
-  if (! (isnumeric (y) && isreal (y) && isvector (y)))
+  if (! (isnumeric (y) && isreal (y) && (isvector (y) || isempty (y))))
     error ("lasso: Y must be a real vector.");
   endif
   y = y(:);
   if (rows (X) != numel (y))
     error ("lasso: X and Y must have the same number of observations.");
+  endif
+  if (rows (X) < 2)
+    error ("lasso: The parameter 'X' must have at least two rows.");
   endif
 
   ## Defaults and Name-Value parsing.
@@ -449,3 +452,8 @@ endfunction
 %!error <lasso: 'Alpha' must be a scalar in .0, 1..> lasso (X, y, "Alpha", 0)
 %!error <lasso: 'Lambda' must be a vector of non-negative values.> ...
 %! lasso (X, y, "Lambda", [-1 2])
+
+%!test
+%! ## Edge cases with empty arrays
+%!fail ("lasso ([], [])", "lasso: The parameter 'X' must have at least two rows.")
+%!fail ("lasso (zeros (0, 3), zeros (0, 1))", "lasso: The parameter 'X' must have at least two rows.")

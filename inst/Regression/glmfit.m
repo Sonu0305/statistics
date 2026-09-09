@@ -134,9 +134,9 @@ function [b, dev, stats] = glmfit (X, y, distribution, varargin)
     error ("glmfit: too few input arguments.");
   elseif (mod (nargin - 3, 2) != 0)
     error ("glmfit: Name-Value arguments must be in pairs.");
-  elseif (! isnumeric (X) || isempty (X))
+  elseif (! isnumeric (X))
     error ("glmfit: X must be a numeric matrix.");
-  elseif (! (isnumeric (y) || islogical (y)) || isempty (y))
+  elseif (! (isnumeric (y) || islogical (y)))
     error ("glmfit: Y must be either a numeric matrix or a logical vector.");
   elseif (size (X, 1) != size (y, 1))
     error ("glmfit: X and Y must have the same number of observations.");
@@ -169,7 +169,7 @@ function [b, dev, stats] = glmfit (X, y, distribution, varargin)
       N = ones (size (y));
     endif
   else
-    if (cy != 1)
+    if (cy != 1 && ! isempty (y))
       error (strcat ("glmfit: for distributions other than 'binomial',", " Y must be an n-by-1 column vector."));
     endif
   endif
@@ -596,11 +596,11 @@ endfunction
 %! glmfit (rand (6, 1), rand (6, 1), 'poisson', 'link')
 %!error <glmfit: X must be a numeric matrix.> ...
 %! glmfit ('abc', rand (6, 1), 'poisson')
-%!error <glmfit: X must be a numeric matrix.> ...
+%!error <glmfit: X and Y must have the same number of observations.> ...
 %! glmfit ([], rand (6, 1), 'poisson')
 %!error <glmfit: Y must be either a numeric matrix or a logical vector.> ...
 %! glmfit (rand (5, 2), 'abc', 'poisson')
-%!error <glmfit: Y must be either a numeric matrix or a logical vector.> ...
+%!error <glmfit: X and Y must have the same number of observations.> ...
 %! glmfit (rand (5, 2), [], 'poisson')
 %!error <glmfit: X and Y must have the same number of observations.> ...
 %! glmfit (rand (5, 2), rand (6, 1), 'poisson')
@@ -720,3 +720,15 @@ endfunction
 %! glmfit (rand (5, 2), rand (5, 1), 'normal', 'weights', [1; 2; 3; 4])
 %!error <glmfit: 'Weights' must be a numeric vector of the same size as Y.> ...
 %! glmfit (rand (5, 2), rand (5, 1), 'normal', 'weights', 'asdfg')
+
+%!test
+%! ## Edge cases with empty arrays
+%! warning ("off", "glmfit: X is ill-conditioned.");
+%! b = glmfit ([], [], 'normal');
+%! assert_equal (size (b), [1 1]);
+%! assert_equal (b, 0);
+%!
+%! b = glmfit (zeros (0, 3), zeros (0, 1), 'normal');
+%! assert_equal (size (b), [4 1]);
+%! assert_equal (b, zeros (4, 1));
+%! warning ("on", "glmfit: X is ill-conditioned.");
