@@ -109,7 +109,9 @@ function dgram = linkage (d, method = 'single', distarg, savememory)
   endif
 
   if (isempty (d))
-    error ("linkage: d cannot be empty");
+    if (size (d, 1) == 0 && size (d, 2) == 0)
+      error ("linkage: you must have at least one distance to perform linkage.");
+    endif
   endif
 
   methods = struct ...
@@ -387,4 +389,11 @@ endfunction
 %! L = linkage (y, 'average', 'euclidean');
 %! assert_equal (all (L(:,1) >= 1 & L(:,1) <= 11), true);  # valid cluster refs
 %! assert_equal (all (L(:,2) >= 1 & L(:,2) <= 11), true);
+
+%!test
+%! ## Edge cases with empty arrays
+%!error <linkage: you must have at least one distance to perform linkage.> ...
+%! linkage ([])
+%!error <pdist: X must be a nonempty numeric matrix.> ...
+%! linkage (zeros(0,3))
 %! assert_equal (all (L(:,1) < L(:,2)), true);  # sorted within rows
