@@ -93,8 +93,10 @@ function [idx, corepts] = dbscan (X, epsilon, minpts, varargin)
   endif
 
   ## Validate X
-  if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2 || isempty (X))
-    error ("dbscan: X must be a nonempty real numeric matrix.");
+  if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2)
+    error ("dbscan: x must be a real numeric matrix.");
+  elseif (isempty (X))
+    error ("dbscan: expected x to be nonempty.");
   endif
 
   ## Validate epsilon
@@ -246,9 +248,13 @@ endfunction
 ## Test input validation
 %!error <dbscan: too few input arguments.> dbscan (1)
 %!error <dbscan: too few input arguments.> dbscan (1, 1)
-%!error <dbscan: X must be a nonempty real numeric matrix.> dbscan ([], 1, 1)
-%!error <dbscan: X must be a nonempty real numeric matrix.> dbscan ("a", 1, 1)
-%!error <dbscan: X must be a nonempty real numeric matrix.> dbscan (i, 1, 1)
+%!test
+%! ## Edge cases with empty arrays
+%!error <dbscan: expected x to be nonempty.> dbscan ([], 1, 1)
+%!error <dbscan: expected x to be nonempty.> dbscan (zeros(0,3), 1, 1)
+
+%!error <dbscan: x must be a real numeric matrix.> dbscan ("a", 1, 1)
+%!error <dbscan: x must be a real numeric matrix.> dbscan (i, 1, 1)
 %!error <dbscan: EPSILON must be a nonnegative scalar.> dbscan (ones (3,2), [1 2], 1)
 %!error <dbscan: EPSILON must be a nonnegative scalar.> dbscan (ones (3,2), -1, 1)
 %!error <dbscan: EPSILON must be a nonnegative scalar.> dbscan (ones (3,2), "a", 1)
