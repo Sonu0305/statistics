@@ -102,8 +102,8 @@ function [idx, C, sumd, D, midx, info] = kmedoids (X, k, varargin)
   endif
 
   ## Validate X
-  if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2 || isempty (X))
-    error ("kmedoids: X must be a nonempty real numeric matrix.");
+  if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2)
+    error ("kmedoids: x must be a real numeric matrix.");
   endif
   [N, P] = size (X);
 
@@ -113,7 +113,7 @@ function [idx, C, sumd, D, midx, info] = kmedoids (X, k, varargin)
     error ("kmedoids: K must be a positive integer scalar.");
   endif
   if (k > N)
-    error ("kmedoids: K cannot exceed the number of observations in X.");
+    error ("kmedoids: x must have at least as many rows as the number of clusters.");
   endif
 
   ## Defaults
@@ -437,11 +437,12 @@ endfunction
 
 ## Test input validation
 %!error <kmedoids: too few input arguments.> kmedoids (1)
-%!error <kmedoids: X must be a nonempty real numeric matrix.> kmedoids ([], 2)
-%!error <kmedoids: X must be a nonempty real numeric matrix.> kmedoids ("a", 2)
+%!error <kmedoids: x must have at least as many rows as the number of clusters.> kmedoids ([], 2)
+%!error <kmedoids: x must have at least as many rows as the number of clusters.> kmedoids (zeros(0,3), 1)
+%!error <kmedoids: x must be a real numeric matrix.> kmedoids ("a", 2)
 %!error <kmedoids: K must be a positive integer scalar.> kmedoids (ones (4,2), 0)
 %!error <kmedoids: K must be a positive integer scalar.> kmedoids (ones (4,2), 1.5)
-%!error <kmedoids: K cannot exceed the number of observations in X.> ...
+%!error <kmedoids: x must have at least as many rows as the number of clusters.> ...
 %! kmedoids (ones (3,2), 4)
 %!error <kmedoids: each NAME must be followed by a VALUE.> ...
 %! kmedoids (ones (4,2), 2, "Distance")
