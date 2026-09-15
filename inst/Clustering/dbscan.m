@@ -248,8 +248,7 @@ endfunction
 ## Test input validation
 %!error <dbscan: too few input arguments.> dbscan (1)
 %!error <dbscan: too few input arguments.> dbscan (1, 1)
-%!test
-%! ## Edge cases with empty arrays
+## Edge cases with empty arrays
 %!error <dbscan: expected x to be nonempty.> dbscan ([], 1, 1)
 %!error <dbscan: expected x to be nonempty.> dbscan (zeros(0,3), 1, 1)
 
