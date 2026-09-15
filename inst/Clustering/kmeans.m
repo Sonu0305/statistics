@@ -188,6 +188,8 @@ function [classes, centers, sumd, D] = kmeans (data, k, varargin)
   ## Input checking, validate the matrix
   if (! isnumeric (data) || ! ismatrix (data) || ! isreal (data))
     error ("kmeans: first input argument must be a DxN real data matrix");
+  elseif (isempty (data))
+    error ("kmeans: expected data to be nonempty.");
   elseif (! isnumeric (k))
     error ("kmeans: second argument must be numeric");
   endif
@@ -668,3 +670,8 @@ endfunction
 %!error kmeans (rand (4,3), 2, 'maxiter', [1 2]);
 %!error kmeans (rand (4,3), 2, 'maxiter', 'one');
 %!error <empty cluster created> kmeans ([1 0; 1.1 0], 2, 'start', eye (2), 'emptyaction', 'error');
+
+%!test
+%! ## Edge cases with empty arrays
+%!error <kmeans: expected data to be nonempty.> kmeans ([], 1)
+%!error <kmeans: expected data to be nonempty.> kmeans (zeros(0,3), 1)
