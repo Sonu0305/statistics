@@ -390,8 +390,7 @@ endfunction
 %! assert_equal (all (L(:,1) >= 1 & L(:,1) <= 11), true);  # valid cluster refs
 %! assert_equal (all (L(:,2) >= 1 & L(:,2) <= 11), true);
 
-%!test
-%! ## Edge cases with empty arrays
+## Edge cases with empty arrays
 %!error <linkage: you must have at least one distance to perform linkage.> ...
 %! linkage ([])
 %!error <pdist: X must be a nonempty numeric matrix.> ...
