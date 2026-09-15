@@ -42,6 +42,10 @@ function T = clusterdata (X, varargin)
     error ("clusterdata: function called with too few input arguments.");
   endif
 
+  if (isempty (X))
+    error ("clusterdata: x must contain at least one observation to cluster.");
+  endif
+
   linkage_criterion = 'single';
   distance_method = 'euclidean';
   savememory = 'off';
@@ -129,6 +133,17 @@ endfunction
 %! t3 = clusterdata (X, "Cutoff", 0.9, "Depth", 3);
 %! assert_equal (numel (unique (t2)), 4);
 %! assert_equal (numel (unique (t3)), 5);
+%!test
+%! X = rand (20,3);
+%! T = clusterdata (X, 3);
+%! assert_equal (max (T), 3);
+
+%!test
+%! ## Edge cases with empty arrays
+%!error <clusterdata: x must contain at least one observation to cluster.> ...
+%! clusterdata ([], 1)
+%!error <clusterdata: x must contain at least one observation to cluster.> ...
+%! clusterdata (zeros(0,3), 1)
 %! t = clusterdata (X, "MaxClust", 3);
 %! assert_equal (numel (unique (t)), 3);
 %! assert_equal (numel (unique (t([7, 8]))), 1);
