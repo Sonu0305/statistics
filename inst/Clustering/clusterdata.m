@@ -138,8 +138,7 @@ endfunction
 %! T = clusterdata (X, 3);
 %! assert_equal (max (T), 3);
 
-%!test
-%! ## Edge cases with empty arrays
+## Edge cases with empty arrays
 %!error <clusterdata: x must contain at least one observation to cluster.> ...
 %! clusterdata ([], 1)
 %!error <clusterdata: x must contain at least one observation to cluster.> ...
