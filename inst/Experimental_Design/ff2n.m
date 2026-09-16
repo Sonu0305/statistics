@@ -34,21 +34,27 @@ function A = ff2n (n)
   if (nargin != 1)
     error ("ff2n: wrong number of input arguments.");
   endif
-  if (floor (n) != n || numel (n) != 1 || n < 1 ...
-                     || ! isfinite (n) || ! isreal (n))
-    error ("ff2n: @var{N} must be a positive integer scalar.");
+  if (! isempty (n) && numel (n) != 1)
+    error ("ff2n: size inputs must be scalar.");
+  elseif (! isempty (n) && (floor (n) != n || n < 0 || ! isfinite (n) || ! isreal (n)))
+    error ("ff2n: size inputs must be integers.");
   endif
   A = flip (fullfact (2 * ones (1, n)), 2) - 1;
 endfunction
 
 %!error ff2n ();
-%!error ff2n (2, 5);
-%!error ff2n (2.5);
-%!error ff2n (0);
-%!error ff2n (-3);
-%!error ff2n (3+2i);
-%!error ff2n (Inf);
-%!error ff2n (NaN);
+%!error <ff2n: size inputs must be scalar.> ff2n (2, 5);
+%!error <ff2n: size inputs must be scalar.> ff2n ([2 3]);
+%!error <ff2n: size inputs must be integers.> ff2n (2.5);
+%!error <ff2n: size inputs must be integers.> ff2n (-3);
+%!error <ff2n: size inputs must be integers.> ff2n (3+2i);
+%!error <ff2n: size inputs must be integers.> ff2n (Inf);
+%!error <ff2n: size inputs must be integers.> ff2n (NaN);
+
+## Edge cases with empty arrays
+%!test
+%! A = ff2n ([]);
+%! assert_equal (size (A), [1, 0]);
 %!test
 %! A = ff2n (3);
 %! assert_equal (A, [0, 0, 0; 0, 0, 1; 0, 1, 0; 0, 1, 1; ...

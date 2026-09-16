@@ -36,10 +36,10 @@ function A = fullfact (levels)
     error ("fullfact: one input argument is required.");
   endif
   if (! (isvector (levels) && isnumeric (levels) && isfinite (levels)))
-    error ("fullfact: input argument must be a finite real numeric vector.");
+    error ("fullfact: requires a vector input.");
   endif
   if (any (fix (levels) != levels) || any (levels < 1) || ! all (isreal (levels)))
-    error ("fullfact: factor levels must be real positive integers.");
+    error ("fullfact: the input values must be positive integers.");
   endif
   rows = prod (levels);
   cols = numel (levels);
@@ -60,22 +60,23 @@ endfunction
 %! fullfact ([2, 3, 4])
 
 %!error<fullfact: one input argument is required.> fullfact ();
-%!error<fullfact: input argument must be a finite real numeric vector.> ...
+%!error <fullfact: requires a vector input.> ...
 %! fullfact (Inf);
-%!error<fullfact: input argument must be a finite real numeric vector.> ...
+%!error <fullfact: requires a vector input.> ...
 %! fullfact (NaN);
-%!error<fullfact: input argument must be a finite real numeric vector.> ...
+%!error <fullfact: requires a vector input.> ...
 %! fullfact (ones (2));
-%!error<fullfact: input argument must be a finite real numeric vector.> ...
+%!error <fullfact: requires a vector input.> ...
 %! fullfact ([1, 2, NaN]);
-%!error<fullfact: input argument must be a finite real numeric vector.> ...
+%!error <fullfact: requires a vector input.> ...
 %! fullfact ([1, 2, Inf]);
-%!error<fullfact: factor levels must be real positive integers.> fullfact (2.5);
-%!error<fullfact: factor levels must be real positive integers.> fullfact (0);
-%!error<fullfact: factor levels must be real positive integers.> fullfact (-3);
-%!error<fullfact: factor levels must be real positive integers.> fullfact (3+2i);
-%!error<fullfact: factor levels must be real positive integers.> fullfact ([1, 2, -3]);
-%!error<fullfact: factor levels must be real positive integers.> fullfact ([0, 1, 2]);
+%!error <fullfact: requires a vector input.> fullfact ([]);
+%!error <fullfact: the input values must be positive integers.> fullfact (2.5);
+%!error <fullfact: the input values must be positive integers.> fullfact (0);
+%!error <fullfact: the input values must be positive integers.> fullfact (-3);
+%!error <fullfact: the input values must be positive integers.> fullfact (3+2i);
+%!error <fullfact: the input values must be positive integers.> fullfact ([1, 2, -3]);
+%!error <fullfact: the input values must be positive integers.> fullfact ([0, 1, 2]);
 %!test
 %! A = fullfact (1);
 %! assert_equal (A, 1);
