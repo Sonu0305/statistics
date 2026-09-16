@@ -166,6 +166,10 @@ function [lambda, psi, T, stats, F] = factoran (X, m, varargin)
     print_usage ();
   endif
 
+  if (isempty (X))
+    error ("factoran: expected X to be nonempty.");
+  endif
+
   ## ------------------------------------------------------------------ ##
   ## Options
   ## ------------------------------------------------------------------ ##
@@ -741,6 +745,10 @@ endfunction
 %! factoran ([rand(20, 3), ones(20, 1)], 1)
 %!error <factoran: X must have at least two observations.> ...
 %! factoran (rand (1, 5), 1)
+%!error <factoran: expected X to be nonempty.> ...
+%! factoran ([], 1)
+%!error <factoran: expected X to be nonempty.> ...
+%! factoran (zeros (0, 3), 1)
 %!error <factoran: Name-Value arguments must come in pairs.> ...
 %! factoran (rand (20, 5), 1, "Rotate")
 %!error <factoran: unknown parameter name 'bogus'.> ...
