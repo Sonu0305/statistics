@@ -273,3 +273,7 @@ endfunction
 %!error <p must be an integer> cmdscale (eye (3), 1.5)
 %!error <p must be an integer> cmdscale (eye (3), [1, 2])
 %!error <p must be an integer> cmdscale (eye (3), 2 + 1i)
+
+## Edge cases with empty arrays
+%!assert (isempty (cmdscale ([])))
+%!error <cmdscale: matrix input must be square symmetric.> cmdscale (zeros (0, 3))
