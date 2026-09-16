@@ -119,8 +119,26 @@ function [p, anovatab, stats] = anova2 (x, reps, displayopt, model)
   if (nargin < 4)
     model = 'interaction';
   endif
-  epsilonhat = [];
   plotdata = ! (strcmp (displayopt, 'off'));
+
+  if (isempty (x))
+    p = NaN (1, 3);
+    if (nargout > 1 || plotdata)
+      anovatab = {"Source", "SS", "df", "MS", "F", "Prob>F";
+                  "Columns", 0, 0, NaN, NaN, NaN;
+                  "Rows", 0, 0, NaN, NaN, NaN;
+                  "Interaction", 0, 0, NaN, NaN, NaN;
+                  "Error", 0, 0, NaN, [], [];
+                  "Total", 0, 0, [], [], []};
+    endif
+    if (nargout > 2)
+      stats = struct ("source", "anova2", "sigmasq", NaN, ...
+                      "colmeans", [], "coln", [], ...
+                      "rowmeans", [], "rown", [], ...
+                      "inter", 1, "pval", NaN (1, 3), "df", 0);
+    endif
+    return;
+  endif
 
   ## Calculate group numbers
   FFGn = size (x, 1) / reps;            ## Number of groups in Row Factor
@@ -128,7 +146,7 @@ function [p, anovatab, stats] = anova2 (x, reps, displayopt, model)
 
   ## Check for valid repetitions
   if (! (int16 (FFGn) == FFGn))
-    error ("anova2: the number of rows in X must be a multiple of REPS.");
+    error ("anova2: the number of rows must be a multiple of reps.");
   endif
 
   idx_s = 1;
@@ -427,4 +445,11 @@ endfunction
 %! assert_equal (atab{2,6}, 0.141597630656771, 1e-10);
 %! assert_equal (atab{3,6}, 0.000636643812875719, 1e-10);
 
+## Edge cases with empty arrays
+%!test
+%! [p, tbl] = anova2 ([], 1, "off");
+%! assert (all (isnan (p)));
+%! assert (isequal (size (tbl), [6, 6]));
 
+%!error <anova2: the number of rows must be a multiple of reps.> ...
+%! anova2 (rand (5, 2), 2, "off")
