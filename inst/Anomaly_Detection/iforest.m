@@ -131,8 +131,17 @@ endfunction
 
 ## Test input validation
 %!error <iforest: too few input arguments.> iforest ()
-%!error <iforest: X must be a nonempty real numeric matrix.> iforest ([])
-%!error <iforest: X must be a nonempty real numeric matrix.> iforest ("a")
+%!error <iforest: X must be a real numeric matrix.> iforest ("a")
+
+## Edge cases with small/empty arrays
+%!test
+%! [Mdl, tf, scores] = iforest ([]);
+%! assert_equal (tf, false (0, 1));
+%! assert_equal (scores, zeros (0, 1));
+%!test
+%! [Mdl, tf, scores] = iforest ([1]);
+%! assert_equal (tf, false (1, 1));
+%! assert_equal (scores, zeros (1, 1));
 %!error <iforest: each NAME must be followed by a VALUE.> ...
 %! iforest (randn (10,2), "NumLearners")
 %!error <iforest: unknown parameter name 'foo'.> ...

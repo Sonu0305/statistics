@@ -98,8 +98,8 @@ classdef IsolationForest
       if (nargin < 1)
         error ("iforest: too few input arguments.");
       endif
-      if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2 || isempty (X))
-        error ("iforest: X must be a nonempty real numeric matrix.");
+      if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2)
+        error ("iforest: X must be a real numeric matrix.");
       endif
       [n, p] = size (X);
 
@@ -136,10 +136,20 @@ classdef IsolationForest
           || numlearners < 1 || fix (numlearners) != numlearners)
         error ("iforest: NUMLEARNERS must be a positive integer scalar.");
       endif
-      if (! isscalar (numobs) || ! isnumeric (numobs) || numobs < 3
+      if (! isscalar (numobs) || ! isnumeric (numobs) || (numobs < 3 && n >= 3)
           || fix (numobs) != numobs || numobs > n)
         error (strcat ("iforest: NUMOBSERVATIONSPERLEARNER must be an", ...
                        " integer in [3, N]."));
+      endif
+      if (n < 3)
+        obj.NumLearners               = numlearners;
+        obj.NumObservationsPerLearner = numobs;
+        obj.ContaminationFraction     = contam;
+        obj.trees_                    = {};
+        obj.ScoreThreshold            = 0;
+        obj.scores_                   = zeros (n, 1);
+        obj.tf_                       = false (n, 1);
+        return;
       endif
       if (! isscalar (contam) || ! isnumeric (contam) || contam < 0
                               || contam > 1)

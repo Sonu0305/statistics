@@ -139,16 +139,20 @@ endfunction
 
 ## Test input validation
 %!error <lof: too few input arguments.> lof ()
-%!error <lof: X must be a nonempty real numeric matrix.> lof ([])
-%!error <lof: X must be a nonempty real numeric matrix.> lof ("a")
+%!error <lof: input data must have at least two rows after missing values.> lof ([])
+%!error <lof: input data must have at least two rows after missing values.> lof ("a")
 %!error <lof: each NAME must be followed by a VALUE.> lof (ones (5,2), "Distance")
 %!error <lof: unknown parameter name 'foo'.> lof (ones (5,2), "foo", "bar")
 %!error <lof: unsupported distance metric 'taxicab'.> ...
 %! lof (ones (5,2), "Distance", "taxicab")
-%!error <lof: NUMNEIGHBORS must be a positive integer less than N.> ...
+%!error <lof: NUMNEIGHBORS must be a positive integer.> ...
 %! lof (ones (5,2), "NumNeighbors", 0)
-%!error <lof: NUMNEIGHBORS must be a positive integer less than N.> ...
-%! lof (ones (5,2), "NumNeighbors", 5)
+
+## Edge cases with small/large NumNeighbors
+%!test
+%! [Mdl, tf, scores] = lof ([1; 2], "NumNeighbors", 5);
+%! assert_equal (Mdl.NumNeighbors, 1);
+%! assert_equal (size (scores), [2, 1]);
 %!error <lof: CONTAMINATIONFRACTION must be a scalar in .0, 1..> ...
 %! lof (magic (5), "NumNeighbors", 2, "ContaminationFraction", 1.5)
 %!error <isanomaly: XNEW must have the same number of columns as X.> ...

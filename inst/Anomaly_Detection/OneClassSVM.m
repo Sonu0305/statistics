@@ -118,8 +118,11 @@ classdef OneClassSVM
       if (nargin < 1)
         error ("ocsvm: too few input arguments.");
       endif
-      if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2 || isempty (X))
-        error ("ocsvm: X must be a nonempty real numeric matrix.");
+      if (isempty (X))
+        error ("ocsvm: input data is empty.");
+      endif
+      if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2)
+        error ("ocsvm: X must be a real numeric matrix.");
       endif
       [n, p] = size (X);
 

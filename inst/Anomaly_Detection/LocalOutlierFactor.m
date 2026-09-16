@@ -101,8 +101,8 @@ classdef LocalOutlierFactor
       if (nargin < 1)
         error ("lof: too few input arguments.");
       endif
-      if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2 || isempty (X))
-        error ("lof: X must be a nonempty real numeric matrix.");
+      if (! isnumeric (X) || ! isreal (X) || ndims (X) != 2 || size (X, 1) < 2)
+        error ("lof: input data must have at least two rows after missing values.");
       endif
       [n, p] = size (X);
 
@@ -147,9 +147,10 @@ classdef LocalOutlierFactor
       if (! any (strcmp (distance, metrics)))
         error ("lof: unsupported distance metric '%s'.", distance);
       endif
-      if (! isscalar (k) || ! isnumeric (k) || k < 1 || fix (k) != k || k >= n)
-        error ("lof: NUMNEIGHBORS must be a positive integer less than N.");
+      if (! isscalar (k) || ! isnumeric (k) || k < 1 || fix (k) != k)
+        error ("lof: NUMNEIGHBORS must be a positive integer.");
       endif
+      k = min (k, n - 1);
       if (! isscalar (contam) || ! isnumeric (contam) || contam < 0
                               || contam > 1)
         error ("lof: CONTAMINATIONFRACTION must be a scalar in [0, 1].");

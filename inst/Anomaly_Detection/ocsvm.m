@@ -161,8 +161,8 @@ endfunction
 
 ## Test input validation
 %!error <ocsvm: too few input arguments.> ocsvm ()
-%!error <ocsvm: X must be a nonempty real numeric matrix.> ocsvm ([])
-%!error <ocsvm: X must be a nonempty real numeric matrix.> ocsvm ("a")
+%!error <ocsvm: input data is empty.> ocsvm ([])
+%!error <ocsvm: X must be a real numeric matrix.> ocsvm ("a")
 %!error <ocsvm: each NAME must be followed by a VALUE.> ...
 %! ocsvm (randn (10,2), "KernelScale")
 %!error <ocsvm: unknown parameter name 'foo'.> ...
