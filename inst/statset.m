@@ -157,20 +157,24 @@ function options = statset (varargin)
   ## An optional leading structure supplies the starting values, and an
   ## optional second structure overrides them where it is not empty.
   args = varargin;
-  if (isstruct (args{1}))
-    options = merge_struct (options, args{1}, names);
-    args(1) = [];
-    if (numel (args) > 0 && isstruct (args{1}))
+  if (isstruct (args{1}) || (isempty (args{1}) && isnumeric (args{1})))
+    if (isstruct (args{1}))
       options = merge_struct (options, args{1}, names);
+    endif
+    args(1) = [];
+    if (numel (args) > 0 && (isstruct (args{1}) || (isempty (args{1}) && isnumeric (args{1}))))
+      if (isstruct (args{1}))
+        options = merge_struct (options, args{1}, names);
+      endif
       args(1) = [];
     endif
   elseif (! ischar (args{1}) && ! isstring_scalar (args{1}))
-    error (strcat ("statset: first argument must be a function name,", ...
-                   " an option name, or an options structure."));
+    error (strcat ("statset: expected argument 1 to be a character vector", ...
+                   " or string scalar."));
   endif
 
   if (mod (numel (args), 2) != 0)
-    error ("statset: arguments must occur in NAME/VALUE pairs.");
+    error ("statset: arguments must occur in name-value pairs.");
   endif
 
   ## Apply the name/value pairs.
@@ -181,7 +185,7 @@ function options = statset (varargin)
     endif
     idx = find (strcmpi (char (name), names));
     if (isempty (idx))
-      error ("statset: unrecognized option name '%s'.", char (name));
+      error ("statset: '%s' is not a valid value for the parameter name.", char (name));
     endif
     field = names{idx};
     options.(field) = check_value (field, args{i+1});
@@ -715,17 +719,21 @@ endfunction
 %!error<statset: no default options available for the function 'TreeBagger'.> ...
 %! statset ('TreeBagger')
 
-%!error<statset: first argument must be a function name, an option name, or an options structure.> ...
+%!error<statset: expected argument 1 to be a character vector or string scalar.> ...
 %! statset (1, 2)
 
-%!error<statset: arguments must occur in NAME/VALUE pairs.> ...
+%!error<statset: arguments must occur in name-value pairs.> ...
 %! statset ('MaxIter', 5, 'TolX')
 
-%!error<statset: arguments must occur in NAME/VALUE pairs.> ...
+%!error<statset: arguments must occur in name-value pairs.> ...
 %! statset (statset (), 'MaxIter')
 
-%!error<statset: unrecognized option name 'NoSuchOption'.> ...
+%!error<statset: 'NoSuchOption' is not a valid value for the parameter name.> ...
 %! statset ('NoSuchOption', 1)
+
+%!test
+%! options = statset ([]);
+%! assert_equal (options, statset ());
 
 %!error<statset: option 'MaxIter' must be a real positive scalar.> ...
 %! statset ('MaxIter', 'abc')
