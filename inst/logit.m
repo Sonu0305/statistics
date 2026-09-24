@@ -40,6 +40,14 @@ function x = logit (p)
     print_usage ();
   endif
 
+  if (! isnumeric (p) && ! islogical (p))
+    error ("logit: P must be a numeric or logical array.");
+  endif
+
+  if (! isfloat (p))
+    p = double (p);
+  endif
+
   x = logiinv (p, 0, 1);
 
 endfunction
@@ -54,3 +62,11 @@ endfunction
 ## Test input validation
 %!error logit ()
 %!error logit (1, 2)
+%!error <logit: P must be a numeric or logical array.> logit ("a")
+%!error <logit: P must be a numeric or logical array.> logit ({0.5})
+
+## Test logical and integer casting
+%!test
+%! assert_equal (logit (true), Inf);
+%! assert_equal (logit (false), -Inf);
+%! assert_equal (logit (int8(0)), -Inf);
