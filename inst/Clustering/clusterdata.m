@@ -42,6 +42,10 @@ function T = clusterdata (X, varargin)
     error ("clusterdata: function called with too few input arguments.");
   endif
 
+  if (size (X, 1) < 2)
+    error ("clusterdata: requires at least two observations to calculate a distance.");
+  endif
+
   linkage_criterion = 'single';
   distance_method = 'euclidean';
   savememory = 'off';
@@ -51,6 +55,9 @@ function T = clusterdata (X, varargin)
 
   if (isnumeric (varargin{1}))              # clusterdata (X, cutoff)
     C = varargin{1};
+    if (! isscalar (C) || C < 0)
+      error ("clusterdata: CUTOFF must be a non-negative scalar or an integer >= 2.");
+    endif
     if (fix (C) == C && (C >= 2))
       clustering_method = 'MaxClust';
     else
@@ -89,12 +96,27 @@ function T = clusterdata (X, varargin)
                    " or 'Cutoff' when using name-value arguments."));
   endif
 
+  ## Filter out missing data
+  nan_rows = any (isnan (X), 2);
+  has_nans = any (nan_rows);
+  if (has_nans)
+    warning ("clusterdata: rows of X with missing data will be ignored.");
+    X(nan_rows, :) = [];
+  endif
+
   ## main body
   Z = linkage (X, linkage_criterion, distance_method, 'savememory');
   if (strcmp (lower (clustering_method), 'cutoff'))
-    T = cluster (Z, clustering_method, C, 'Criterion', criterion, 'Depth', D);
+    T_temp = cluster (Z, clustering_method, C, 'Criterion', criterion, 'Depth', D);
   else
-    T = cluster (Z, clustering_method, C);
+    T_temp = cluster (Z, clustering_method, C);
+  endif
+
+  if (has_nans)
+    T = NaN (size (nan_rows));
+    T(! nan_rows) = T_temp;
+  else
+    T = T_temp;
   endif
 endfunction
 
@@ -113,8 +135,11 @@ endfunction
 %! clusterdata ()
 %!error<clusterdata: function called with too few input arguments.> ...
 %! clusterdata (1)
-%!error <unknown property .*> clusterdata ([1 1], 'Bogus', 1)
-%!error <specify .* 'MaxClust' or 'Cutoff' .*> clusterdata ([1 1], 'Depth', 1)
+%!error <unknown property .*> clusterdata ([1 1; 2 2], 'Bogus', 1)
+%!error <specify .* 'MaxClust' or 'Cutoff' .*> clusterdata ([1 1; 2 2], 'Depth', 1)
+%!error <clusterdata: requires at least two observations to calculate a distance.> clusterdata ([1 1], 2)
+%!error <clusterdata: requires at least two observations to calculate a distance.> clusterdata ([], 2)
+%!error <clusterdata: CUTOFF must be a non-negative scalar or an integer >= 2.> clusterdata ([1 1; 2 2], -1)
 
 ## MaxClust must deliver the number of clusters it was asked for, whatever the
 ## merge heights do.  Verified against MATLAB R2024a.
@@ -132,3 +157,11 @@ endfunction
 %! t = clusterdata (X, "MaxClust", 3);
 %! assert_equal (numel (unique (t)), 3);
 %! assert_equal (numel (unique (t([7, 8]))), 1);
+
+%!test  # NaN handling
+%! X = [0 0; 0 1; 1 0; NaN NaN; 5 6; 6 5];
+%! warning ("off", "clusterdata: rows of X with missing data will be ignored.");
+%! t = clusterdata (X, 2);
+%! assert_equal (length (t), 6);
+%! assert_equal (isnan (t(4)), true);
+%! assert_equal (isnan (t(1)), false);
