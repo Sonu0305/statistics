@@ -61,17 +61,11 @@ function y = poisspdf (x, lambda)
     endif
   endif
 
-  ## Check for X and LAMBDA being double, single, or integer
-  if (! (isnumeric (x) && isnumeric (lambda)))
-    error ("poisspdf: X and LAMBDA must be double, single, or integer.");
-  endif
-
-  ## Integer input is promoted to double, so the result is a probability
-  ## rather than a value truncated to the input's integer type.
-  if (isinteger (x))
+  ## Cast X and LAMBDA to double if they are not floats
+  if (! isfloat (x))
     x = double (x);
   endif
-  if (isinteger (lambda))
+  if (! isfloat (lambda))
     lambda = double (lambda);
   endif
 
@@ -134,8 +128,7 @@ endfunction
 %! poisspdf (ones (3), ones (2))
 %!error<poisspdf: X and LAMBDA must be of common size or scalars.> ...
 %! poisspdf (ones (2), ones (3))
-%!error<poisspdf: X and LAMBDA must be double, single, or integer.> poisspdf (true, 2)
-%!error<poisspdf: X and LAMBDA must be double, single, or integer.> poisspdf ('a', 2)
+%!assert_equal (poisspdf ('a', 5), 4.420456108115668e-87, eps)
 %!assert_equal (class (poisspdf (int32 (2), 2)), 'double')
 %!error<poisspdf: X and LAMBDA must not be complex.> poisspdf (i, 2)
 %!error<poisspdf: X and LAMBDA must not be complex.> poisspdf (2, i)
