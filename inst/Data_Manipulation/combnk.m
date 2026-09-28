@@ -31,14 +31,14 @@ function retval = combnk (data, k)
   if (nargin != 2)
     print_usage;
   elseif (! isvector (data))
-    error ("combnk: first input argument must be a vector");
-  elseif (!isreal (k) || k != round (k) || k < 0)
-    error ("combnk: second input argument must be a non-negative integer");
+    error ("combnk: the first input must be a one-dimensional vector.");
+  elseif (!isreal (k) || k != round (k))
+    error ("combnk: K must be an integer scalar.");
   endif
 
   ## Simple checks
   n = numel (data);
-  if (k == 0)
+  if (k <= 0)
     retval = resize (data, 1, 0);
   elseif (k > n)
     retval = resize (data, 0, k);
@@ -106,3 +106,7 @@ endfunction
 %!assert_equal (combnk ((1:3)', 0), zeros (1, 0))
 %!assert_equal (combnk ('abc', 0), char (zeros (1, 0)))
 %!assert_equal (combnk (int8 (1:3), 0), zeros (1, 0, 'int8'))
+%!assert_equal (combnk (1:3, -1), zeros (1, 0))
+
+%!error <combnk: the first input must be a one-dimensional vector.> combnk ([1 2; 3 4], 2)
+%!error <combnk: K must be an integer scalar.> combnk (1:3, 1.5)
