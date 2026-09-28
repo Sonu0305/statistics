@@ -85,7 +85,7 @@ function [p, tbl, stats] = friedman (x, reps, displayopt)
   narginchk (1, 3);
   ## Check for NaN values in X
   if (any (isnan (x(:))))
-    error ("friedman: NaN values in input are not allowed.");
+    error ("friedman: NaN values in input not allowed.");
   endif
 
   ## Add defaults
@@ -96,7 +96,7 @@ function [p, tbl, stats] = friedman (x, reps, displayopt)
   ## Check for correct size of input matrix
   [r, c] = size (x);
   if (r <= 1 || c <= 1)
-    error ("friedman: bad size of input matrix.");
+    error ("friedman: must have at least two rows and columns.");
   endif
   if (reps > 1)
     r = r / reps;
@@ -312,7 +312,13 @@ endfunction
 %!error<friedman: displayopt must be either 'on' or 'off'.> ...
 %! friedman ([5.5, 4.5, 3.5; 5.5, 4.5, 4.0; 6.0, 4.0, 3.0; 6.5, 5.0, 4.0; ...
 %!            7.0, 5.5, 5.0; 7.0, 5.0, 4.5], 3, 'invalid_displayopt');
-%!error<friedman: NaN values in input are not allowed.> ...
+%!error<friedman: NaN values in input not allowed.> ...
 %! friedman ([1, 2; NaN, 4]);
 %!error<friedman: repetitions and observations do not match.> ...
 %! friedman ([1,2; 3,4; 5,6], 2);
+%!error<friedman: must have at least two rows and columns.> ...
+%! friedman ([]);
+%!error<friedman: must have at least two rows and columns.> ...
+%! friedman (ones (1, 3));
+%!error<friedman: must have at least two rows and columns.> ...
+%! friedman (ones (3, 1));

@@ -84,7 +84,11 @@
 function [d, p, stats] = manova1 (x, group, alpha)
 
   ## Check input arguments
-  narginchk (2,3)
+  if (nargin < 2)
+    error ("manova1: Not enough input arguments.");
+  elseif (nargin > 3)
+    error ("manova1: Too many input arguments.");
+  endif
   nargoutchk (1,3)
 
   ## Validate alpha value if parsed or add default
@@ -257,3 +261,5 @@ endfunction
 %! assert_equal (d, 2);
 %! assert_equal (p, [0, 0.00516082975137544, 0.1206528056514453]', ...
 %!            [1e-12, 1e-12, 1e-12]');
+%!error <manova1: Not enough input arguments.> manova1 ()
+%!error <manova1: Not enough input arguments.> manova1 ([])
