@@ -33,6 +33,14 @@ function x = probit (p)
     print_usage ();
   endif
 
+  if (! isnumeric (p) && ! islogical (p))
+    error ("probit: P must be a numeric or logical array.");
+  endif
+
+  if (! isfloat (p))
+    p = double (p);
+  endif
+
   x = -sqrt (2) * erfcinv (2 * p);
 
 endfunction
@@ -44,3 +52,18 @@ endfunction
 ## Test input validation
 %!error probit ()
 %!error probit (1, 2)
+%!error <probit: P must be a numeric or logical array.> probit ("a")
+%!error <probit: P must be a numeric or logical array.> probit ({0.5})
+
+## Test logical and integer casting
+%!test
+%! assert_equal (probit (true), Inf);
+%! assert_equal (probit (false), -Inf);
+%! assert_equal (probit (int8(0)), -Inf);
+
+## Test on large 3D numeric array (huge complex inputs)
+%!test
+%! p = ones (50, 50, 50) * 0.5;
+%! x = probit (p);
+%! assert_equal (size (x), [50, 50, 50]);
+%! assert_equal (x, zeros (50, 50, 50));
