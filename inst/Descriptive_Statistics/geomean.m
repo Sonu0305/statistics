@@ -83,7 +83,7 @@ function m = geomean (x, varargin)
   endif
 
   if (! isnumeric (x) || ! isreal (x) || ! all (x(! isnan (x))(:) >= 0))
-    error ("geomean: X must contain real nonnegative values.");
+    error ("geomean: input X cannot have negative or complex values.");
   endif
 
   ## Set initial conditions
@@ -294,8 +294,8 @@ endfunction
 %! assert_equal (geomean (x, [3 2], 'omitnan'), m, 4e-13);
 
 ## Test errors
-%!error <geomean: X must contain real nonnegative values.> geomean ('char')
-%!error <geomean: X must contain real nonnegative values.> geomean ([1 -1 3])
+%!error <geomean: input X cannot have negative or complex values.> geomean ('char')
+%!error <geomean: input X cannot have negative or complex values.> geomean ([1 -1 3])
 %!error <geomean: DIM must be a positive integer scalar or vector.> ...
 %! geomean (repmat ([1:20;6:25], [5 2 6 3 5]), -1)
 %!error <geomean: DIM must be a positive integer scalar or vector.> ...
