@@ -66,9 +66,15 @@ function y = normpdf (x, mu, sigma)
     endif
   endif
 
-  ## Check for X, MU, and SIGMA being double or single
-  if (! (isfloat (x) && isfloat (mu) && isfloat (sigma)))
-    error ("normpdf: X, MU, and SIGMA must be double or single.");
+  ## Cast X, MU, and SIGMA to double if they are not floats
+  if (! isfloat (x))
+    x = double (x);
+  endif
+  if (! isfloat (mu))
+    mu = double (mu);
+  endif
+  if (! isfloat (sigma))
+    sigma = double (sigma);
   endif
 
   ## Check for X, MU, and SIGMA being reals
@@ -145,9 +151,7 @@ endfunction
 %! normpdf (ones (2), ones (3), ones (2))
 %!error<normpdf: X, MU, and SIGMA must be of common size or scalars.> ...
 %! normpdf (ones (2), ones (2), ones (3))
-%!error<normpdf: X, MU, and SIGMA must be double or single.> normpdf (int32 (2), 2, 2)
-%!error<normpdf: X, MU, and SIGMA must be double or single.> normpdf (true, 2, 2)
-%!error<normpdf: X, MU, and SIGMA must be double or single.> normpdf ('a', 2, 2)
+%!assert_equal (normpdf ('a', 2, 2), 0, 1e-12)
 %!error<normpdf: X, MU, and SIGMA must not be complex.> normpdf (i, 2, 2)
 %!error<normpdf: X, MU, and SIGMA must not be complex.> normpdf (2, i, 2)
 %!error<normpdf: X, MU, and SIGMA must not be complex.> normpdf (2, 2, i)
