@@ -55,8 +55,17 @@ function [residuals, reconstructed] = pcares (x, ndim)
   if (nargin < 2)
     error ("pcares: too few input arguments.");
   endif
-  if (ndim > size (x, 2))
-    error ("pcares: NDIM must be less than or equal to the column of X.");
+
+  if (! isnumeric (x))
+    error ("pcares: X must be a numeric array.");
+  endif
+
+  if (! isfloat (x))
+    x = double (x);
+  endif
+
+  if (! isscalar (ndim) || ndim <= 0 || fix (ndim) != ndim || ndim > size (x, 2))
+    error ("pcares: NDIM must be a positive integer scalar less than or equal to the number of columns in X.");
   endif
 
   ## Mean center data
@@ -117,6 +126,8 @@ endfunction
 
 ## Test input validation
 %!error<pcares: too few input arguments.> pcares (ones (20, 3))
-%!error<pcares: NDIM must be less than or equal to the column of X.> ...
-%! pcares (ones (30, 2), 3)
-
+%!error<pcares: NDIM must be a positive integer scalar less than or equal to the number of columns in X.> pcares (ones (30, 2), 3)
+%!error<pcares: NDIM must be a positive integer scalar less than or equal to the number of columns in X.> pcares (ones (30, 2), 0)
+%!error<pcares: NDIM must be a positive integer scalar less than or equal to the number of columns in X.> pcares (ones (30, 2), -1)
+%!error<pcares: NDIM must be a positive integer scalar less than or equal to the number of columns in X.> pcares (ones (30, 2), [1 1])
+%!error<pcares: X must be a numeric array.> pcares ('abcd', 1)
