@@ -89,6 +89,10 @@ function m = trimmean (x, p, varargin)
     print_usage;
   endif
 
+  if (! isfloat (x))
+    x = double (x);
+  endif
+
   ## A non-scalar percentage used to slip through, because each half of the
   ## range test was then itself non-scalar and neither branch was taken: the
   ## trimming ran on a colon built from a vector and returned an untrimmed
@@ -129,7 +133,7 @@ function m = trimmean (x, p, varargin)
     flag = 'round';
   endif
   if (! any (strcmpi (flag, {'round', 'floor', 'weighted'})))
-    error ("trimmean: invalid FLAG argument.");
+    error ("trimmean: FLAG must be one of 'round', 'floor', or 'weighted'.");
   endif
 
   ## Check DIM
@@ -379,8 +383,9 @@ endfunction
 %! trimmean ([1 2 3 4], [])
 %!error<trimmean: PERCENT must be a real scalar in the range \[0, 100\).> ...
 %! trimmean ([1 2 3 4], 10 + 2i)
-%!error<trimmean: invalid FLAG argument.> trimmean ([1 2 3 4], 10, 'flag')
-%!error<trimmean: invalid FLAG argument.> trimmean ([1 2 3 4], 10, 'flag', 1)
+%!assert_equal (trimmean ('abc', 10), 98, eps)
+%!error<trimmean: FLAG must be one of 'round', 'floor', or 'weighted'.> trimmean ([1 2 3 4], 10, 'flag')
+%!error<trimmean: FLAG must be one of 'round', 'floor', or 'weighted'.> trimmean ([1 2 3 4], 10, 'flag', 1)
 %!error<trimmean: DIM must be a positive integer scalar or vector.> ...
 %! trimmean ([1 2 3 4], 10, -1)
 %!error<trimmean: DIM must be a positive integer scalar or vector.> ...
