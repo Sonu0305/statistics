@@ -81,8 +81,8 @@ function m = harmmean (x, varargin)
     print_usage ();
   endif
 
-  if (! isnumeric (x) || ! isreal (x) || ! all (x(! isnan (x))(:) >= 0))
-    error ("harmmean: X must contain real nonnegative values.");
+  if (! isfloat (x))
+    x = double (x);
   endif
 
   ## Set initial conditions
@@ -320,8 +320,9 @@ endfunction
 %!assert_equal (harmmean ([], 3), [])
 
 ## Test errors
-%!error <harmmean: X must contain real nonnegative values.> harmmean ('char')
-%!error <harmmean: X must contain real nonnegative values.> harmmean ([1 -1 3])
+%!assert_equal (harmmean ('a'), 97, eps)
+%!assert_equal (harmmean ([1 -1 3]), 9, eps)
+%!assert_equal (harmmean ([1 1i]), 1 + 1i, eps)
 %!error <harmmean: DIM must be a positive integer scalar or vector.> ...
 %! harmmean (repmat ([1:20;6:25], [5 2 6 3 5]), -1)
 %!error <harmmean: DIM must be a positive integer scalar or vector.> ...
