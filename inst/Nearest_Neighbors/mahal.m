@@ -43,24 +43,23 @@ function retval = mahal (y, x)
     print_usage ();
   endif
 
-  if (! (isnumeric (x) || islogical (x)) || ! (isnumeric (y) || islogical (y)))
-    error ("mahal: X and Y must be numeric matrices or vectors");
+  if (! isfloat (x))
+    x = double (x);
+  endif
+  if (! isfloat (y))
+    y = double (y);
   endif
 
-  if (! ismatrix (x) || ! ismatrix (y))
-    error ("mahal: X and Y must be 2-D matrices or vectors");
+  if (! isreal (x) || ! isreal (y))
+    error ("mahal: X and Y must not be complex arrays.");
+  endif
+
+  if (! ismatrix (x) || ! ismatrix (y) || size (x, 2) != size (y, 2))
+    error ("mahal: X and Y must have an identical number of columns.");
   endif
 
   [xr, xc] = size (x);
   [yr, yc] = size (y);
-
-  if (xc != yc)
-    error ("mahal: X and Y must have the same number of columns");
-  endif
-
-  if (isinteger (x))
-    x = double (x);
-  endif
 
   xm = mean (x, 1);
 
@@ -78,11 +77,9 @@ endfunction
 ## Test input validation
 %!error mahal ()
 %!error mahal (1, 2, 3)
-%!error mahal ('A', 'B')
-%!error <must be numeric> mahal ([1, 2], ['A', 'B'])
-%!error mahal (ones (2, 2, 2))
-%!error <must be 2-D matrices> mahal (ones (2, 2), ones (2, 2, 2))
-%!error <same number of columns> mahal (ones (2, 2), ones (2, 3))
+%!error <mahal: X and Y must not be complex arrays.> mahal ([1+1i], [2+2i])
+%!error <must have an identical number of columns> mahal (ones (2, 2), ones (2, 2, 2))
+%!error <must have an identical number of columns> mahal (ones (2, 2), ones (2, 3))
 
 %!test
 %! X = [1 0; 0 1; 1 1; 0 0];
