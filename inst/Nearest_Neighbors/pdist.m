@@ -92,11 +92,17 @@ function D = pdist (X, varargin)
   if (nargin < 1)
     error ("pdist: too few input arguments.");
   endif
-  if (! isnumeric (X) || isempty (X))
-    error ("pdist: X must be a nonempty numeric matrix.");
+  if (! isfloat (X))
+    if (ischar (X))
+      warning ("pdist: converting char data to double.");
+    endif
+    X = double (X);
+  endif
+  if (! isreal (X))
+    error ("pdist: complex input data is not supported.");
   endif
   if (ndims (X) != 2)
-    error ("pdist: X must be a two-dimensional matrix.");
+    error ("pdist: input data must have one or two dimensions only.");
   endif
   if (rows (X) < 2)
     D = cast (zeros (1, 0), class (X));
